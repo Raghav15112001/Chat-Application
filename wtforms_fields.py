@@ -1,10 +1,24 @@
 from email import message
+from typing_extensions import Required
 from xml.dom import ValidationErr
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, EqualTo, ValidationError
 
 from models import User
+
+def invalid_credentials(form, field):
+    """Username and password checker"""
+
+    username_entered = form.username.data
+    password_entered = field.data
+
+    # check username is valid
+    user_object = User.query.filter_by(username=username_entered).first()
+    if user_object is None:
+        raise ValidationError("Username or Password is incorrect")
+    elif password_entered != user_object.password:
+        raise ValidationError("username or passwaord is incorrect")
 
 
 class RegistrationForm(FlaskForm):
@@ -21,3 +35,16 @@ class RegistrationForm(FlaskForm):
         user_object = User.query.filter_by(username=username.data).first()
         if user_object:
             raise ValidationError("Username Already exist , Select different Username.")
+
+
+class LoginForm(FlaskForm):
+    """Login Form"""
+
+    username = StringField('username_label',
+        validators=[InputRequired(message="Username required")])
+    password = PasswordField('password_label',
+        validators=[InputRequired(message="password required"),
+        invalid_credentials])
+    submit_button = SubmitField('Log In')
+
+
