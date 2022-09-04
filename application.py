@@ -13,7 +13,7 @@ app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET')
 
 #Configure database
-app.config['SQLALCHEMY_DATABASE_URI']=os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_DATABASE_URI']= os.environ.get('DATABASE_URL')
 db= SQLAlchemy(app)
 
 # Initialize Flask-SocketIO
@@ -99,7 +99,6 @@ def logout():
 @socketio.on('message')
 def message(data):
 
-    print(f"\n\n{data}\n\n")
     send({'msg':data['msg'], 'username':data['username'],'time_stamp': strftime('%b-%d %I:%M%p',localtime())}, room = data['room'])
 
 @socketio.on('join')
@@ -116,4 +115,4 @@ def leave(data):
 
 
 if __name__ =="__main__":
-    socketio.run(app,debug=True,allow_unsafe_werkzeug=True) 
+    app.run()
