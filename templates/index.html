@@ -9,10 +9,14 @@
   autofocus=true)}} 
   {{ displayField(form.password, 'Password')}}
   {{ displayField(form.confirm_pswd, 'Retype Password')}}
-
-  <div>{{ form.submit_button }}</div>
+  <div class="form-group">
+    <input type="submit" value="Create" class="btn btn-warning">
+</div>
 
   {{form.csrf_token}}
 </form>
 
+<hr>
+
+<p>Already registered? <a href={{url_for('login')}}>Login here</a>.</p>
 {% endblock %}
