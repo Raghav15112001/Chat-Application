@@ -1,8 +1,11 @@
+from time import localtime,strftime 
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager , login_user, current_user,login_required , logout_user
+from flask_socketio import SocketIO, send, emit, join_room,leave_room
 
 from wtforms_fields import *
 from models import *
+
 
 # Configure App
 app = Flask(__name__)
@@ -11,6 +14,11 @@ app.secret_key = 'replace later'
 #Configure database
 app.config['SQLALCHEMY_DATABASE_URI']='postgresql://phzslmnqktoayb:c68a6d5b59a9709d7d254ca627bc999c8b5b23e11b7c47e8b25f2869ccb8fbaf@ec2-3-208-79-113.compute-1.amazonaws.com:5432/d8h8lveblshgp0'
 db= SQLAlchemy(app)
+
+# Initialize Flask-SocketIO
+socketio = SocketIO(app)
+ROOMS = ["lounge","news","games","coding"]
+
 
 # Configure flask login 
 login = LoginManager(app)
@@ -63,11 +71,11 @@ def login():
 # @login_required
 def chat():
 
-            if not current_user.is_authenticated:
-                flash('Please login.','danger')
-                return redirect(url_for('login'))
+            # if not current_user.is_authenticated:
+            #     flash('Please login.','danger')
+            #     return redirect(url_for('login'))
             
-            return "Chat with me"
+            return render_template('chat.html',username=current_user.username,rooms=ROOMS)
 
 
 @app.route("/logout", methods=['GET'])
@@ -77,5 +85,25 @@ def logout():
     flash('You have logout succesfully.','success')
     return redirect(url_for('login'))
 
+
+@socketio.on('message')
+def message(data):
+
+    print(f"\n\n{data}\n\n")
+    send({'msg':data['msg'], 'username':data['username'],'time_stamp': strftime('%b-%d %I:%M%p',localtime())}, room = data['room'])
+
+@socketio.on('join')
+def join(data):
+
+    join_room(data['room'])
+    send({'msg':data['username']+" has joined the " + data['room']+ " room."}, room=data['room'])
+
+@socketio.on('leave')
+def leave(data):
+
+    leave_room(data['room'])
+    send({'msg':data['username']+" has left the " + data['room']+ " room."}, room=data['room'])
+
+
 if __name__ =="__main__":
-    app.run(debug=True) 
+    socketio.run(app,debug=True,allow_unsafe_werkzeug=True) 
