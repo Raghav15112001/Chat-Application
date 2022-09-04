@@ -11,9 +11,11 @@ from models import *
 # Configure App
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET')
+app.config['WTF_CSRF_SECRET_KEY'] = "4e46dd8a391958071ee420b1a165e252f842484a53be29d98f64adbc23d9905f"
 
 #Configure database
 app.config['SQLALCHEMY_DATABASE_URI']= os.environ.get('DATABASE_URL')
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db= SQLAlchemy(app)
 
 # Initialize Flask-SocketIO
