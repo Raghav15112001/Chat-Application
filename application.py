@@ -1,3 +1,4 @@
+import os;
 from time import localtime,strftime 
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_login import LoginManager , login_user, current_user,login_required , logout_user
@@ -9,10 +10,10 @@ from models import *
 
 # Configure App
 app = Flask(__name__)
-app.secret_key = 'replace later'
+app.secret_key = os.environ.get('SECRET')
 
 #Configure database
-app.config['SQLALCHEMY_DATABASE_URI']='postgresql://phzslmnqktoayb:c68a6d5b59a9709d7d254ca627bc999c8b5b23e11b7c47e8b25f2869ccb8fbaf@ec2-3-208-79-113.compute-1.amazonaws.com:5432/d8h8lveblshgp0'
+app.config['SQLALCHEMY_DATABASE_URI']=os.environ.get('DATABASE_URL')
 db= SQLAlchemy(app)
 
 # Initialize Flask-SocketIO
@@ -71,11 +72,20 @@ def login():
 # @login_required
 def chat():
 
-            # if not current_user.is_authenticated:
-            #     flash('Please login.','danger')
-            #     return redirect(url_for('login'))
+            if not current_user.is_authenticated:
+                flash('Please login.','danger')
+                return redirect(url_for('login'))
             
             return render_template('chat.html',username=current_user.username,rooms=ROOMS)
+            
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    # note that we set the 404 status explicitly
+    return render_template('404.html'), 404
+
+
 
 
 @app.route("/logout", methods=['GET'])

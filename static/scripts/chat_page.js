@@ -7,4 +7,9 @@ document.addEventListener('DOMContentLoaded', ()=>{
             document.querySelector('#send_message').click();
         }
     })
+
+        // Make sidebar collapse on click
+        document.querySelector('#show-sidebar-button').onclick = () => {
+            document.querySelector('#sidebar').classList.toggle('view-sidebar');
+        };
 })
