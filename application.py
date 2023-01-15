@@ -10,10 +10,10 @@ from models import *
 
 # Configure App
 app = Flask(__name__)
-app.secret_key = 'replace later'
+app.secret_key = os.environ.get('SECRET_KEY')
 
 #Configure database
-app.config['SQLALCHEMY_DATABASE_URI']= postgresql://phzslmnqktoayb:c68a6d5b59a9709d7d254ca627bc999c8b5b23e11b7c47e8b25f2869ccb8fbaf@ec2-3-208-79-113.compute-1.amazonaws.com:5432/d8h8lveblshgp0
+app.config['SQLALCHEMY_DATABASE_URI']= os.environ.get('DATABASE_URL')
 db= SQLAlchemy(app)
 
 # Initialize Flask-SocketIO
