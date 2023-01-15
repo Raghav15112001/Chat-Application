@@ -1,7 +1,9 @@
 from enum import unique
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
-from application import app
+from flask import Flask
+
+app = Flask(__name__)
 
 db = SQLAlchemy(app)
 
